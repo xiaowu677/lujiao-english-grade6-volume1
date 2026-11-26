@@ -4,9 +4,20 @@ import re
 from pathlib import Path
 
 
-PAGE_PATTERN = re.compile(
-    r"^v2\.1-(?:unit[1-6]|bridging-unit[1-3])(?:-key)?$"
-)
+COURSES = {
+    "grade6": {
+        "label": "六年级上册",
+        "pattern": re.compile(
+            r"^v2\.1-(?:unit[1-6]|bridging-unit[1-3])(?:-key)?$"
+        ),
+        "audio_key": "v2.1",
+    },
+    "grade7": {
+        "label": "七年级上册",
+        "pattern": re.compile(r"^g7-v1-unit[1-7](?:-core)?$"),
+        "audio_key": "g7-v1",
+    },
+}
 
 
 def _read_json_constant(source, marker, next_marker):
@@ -23,7 +34,7 @@ def _audio_id(kind, text):
     return f"{kind}-{digest[:16]}"
 
 
-def _add_item(items, kind, text, source_unit):
+def _add_item(items, kind, text, source_unit, course):
     normalized = " ".join(str(text).split())
     key = (kind, normalized)
     if key not in items:
@@ -33,6 +44,7 @@ def _add_item(items, kind, text, source_unit):
             "kind": kind,
             "text": normalized,
             "filename": f"{audio_id}.mp3",
+            "course": course,
             "sources": [],
         }
     source = items[key]["sources"]
@@ -40,14 +52,17 @@ def _add_item(items, kind, text, source_unit):
         source.append(source_unit)
 
 
-def build_catalog(repo_root):
+def build_catalog(repo_root, course="grade6"):
+    if course not in COURSES:
+        raise ValueError(f"Unknown course: {course}")
+    course_config = COURSES[course]
     repo_root = Path(repo_root)
     outputs = repo_root / "outputs"
     page_dirs = sorted(
         (
             path
             for path in outputs.iterdir()
-            if path.is_dir() and PAGE_PATTERN.fullmatch(path.name)
+            if path.is_dir() and course_config["pattern"].fullmatch(path.name)
         ),
         key=lambda path: path.name,
     )
@@ -64,15 +79,15 @@ def build_catalog(repo_root):
         )
 
         for word in words:
-            _add_item(items, "word", word["en"], page_dir.name)
+            _add_item(items, "word", word["en"], page_dir.name, course)
             context = contexts[word["en"]]
             training = context["trainingSentence"].replace("{{word}}", word["en"])
             acceptance = context["acceptanceSentence"].replace("{{word}}", word["en"])
-            _add_item(items, "training", training, page_dir.name)
-            _add_item(items, "acceptance", acceptance, page_dir.name)
+            _add_item(items, "training", training, page_dir.name, course)
+            _add_item(items, "acceptance", acceptance, page_dir.name, course)
 
         for scene in scenes:
-            _add_item(items, "story", scene["story"], page_dir.name)
+            _add_item(items, "story", scene["story"], page_dir.name, course)
 
     kind_order = {"word": 0, "training": 1, "acceptance": 2, "story": 3}
     return sorted(

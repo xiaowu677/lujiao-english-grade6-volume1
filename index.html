@@ -118,6 +118,30 @@
         white-space: nowrap;
       }
 
+      .grade-switch {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .grade-switch a {
+        padding: 8px 13px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: #aebedf;
+        background: rgba(10, 25, 59, 0.68);
+        font-size: 11px;
+        font-weight: 800;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .grade-switch a.is-active {
+        border-color: rgba(255, 209, 102, 0.38);
+        color: var(--gold);
+        background: rgba(255, 209, 102, 0.08);
+      }
+
       .hero {
         display: grid;
         grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
@@ -387,12 +411,24 @@
 
       @media (max-width: 560px) {
         .shell {
-          width: min(100% - 20px, 460px);
+          width: min(calc(100% - 20px), 460px);
           padding-top: 15px;
         }
 
         .topbar {
+          flex-wrap: wrap;
+          align-items: flex-start;
           margin-bottom: 34px;
+        }
+
+        .grade-switch {
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .grade-switch a {
+          padding: 7px 10px;
+          font-size: 10px;
         }
 
         .top-tag {
@@ -434,7 +470,10 @@
           <span class="brand-mark" aria-hidden="true">✦</span>
           <span>单词星球<small>WORD QUEST · V2.1</small></span>
         </div>
-        <span class="top-tag">鲁教版 · 六年级上册</span>
+        <nav class="grade-switch" aria-label="年级切换">
+          <a class="is-active" href="./">六年级上册</a>
+          <a href="grade7/">七年级上册</a>
+        </nav>
       </header>
 
       <section class="hero">

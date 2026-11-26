@@ -38,11 +38,23 @@ jobs:
               cp "$dir/index.html" "_site/$dir/index.html"
             fi
           done
+          mkdir -p _site/grade7
+          cp grade7/index.html _site/grade7/index.html
+          for dir in outputs/g7-v1-*; do
+            if [ -f "$dir/index.html" ]; then
+              mkdir -p "_site/$dir"
+              cp "$dir/index.html" "_site/$dir/index.html"
+            fi
+          done
           mkdir -p _site/outputs/assets/audio/v2.1/en-GB-SoniaNeural
           cp -R outputs/assets/audio/v2.1/en-GB-SoniaNeural/. \
             _site/outputs/assets/audio/v2.1/en-GB-SoniaNeural/
-          test "$(find _site -name index.html | wc -l)" -eq 19
+          mkdir -p _site/outputs/assets/audio/g7-v1/en-GB-SoniaNeural
+          cp -R outputs/assets/audio/g7-v1/en-GB-SoniaNeural/. \
+            _site/outputs/assets/audio/g7-v1/en-GB-SoniaNeural/
+          test "$(find _site -name index.html | wc -l)" -eq 34
           test "$(find _site/outputs/assets/audio/v2.1 -name '*.mp3' | wc -l)" -eq 968
+          test "$(find _site/outputs/assets/audio/g7-v1 -name '*.mp3' | wc -l)" -eq 1138
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v5
