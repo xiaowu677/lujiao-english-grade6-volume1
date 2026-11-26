@@ -1,0 +1,327 @@
+{
+  "voice": "en-US-JennyNeural",
+  "rate": "-8%",
+  "count": 64,
+  "items": [
+    {
+      "id": "word-apple",
+      "file": "word-apple.mp3",
+      "text": "apple"
+    },
+    {
+      "id": "train-apple",
+      "file": "train-apple.mp3",
+      "text": "At breakfast, Mia puts a red apple on her plate."
+    },
+    {
+      "id": "accept-apple",
+      "file": "accept-apple.mp3",
+      "text": "Tom picks a red fruit from the tree. It is an apple."
+    },
+    {
+      "id": "word-banana",
+      "file": "word-banana.mp3",
+      "text": "banana"
+    },
+    {
+      "id": "train-banana",
+      "file": "train-banana.mp3",
+      "text": "Mia also eats a long yellow banana."
+    },
+    {
+      "id": "accept-banana",
+      "file": "accept-banana.mp3",
+      "text": "Lily peels a long yellow fruit. She eats a banana."
+    },
+    {
+      "id": "word-orange",
+      "file": "word-orange.mp3",
+      "text": "orange"
+    },
+    {
+      "id": "train-orange",
+      "file": "train-orange.mp3",
+      "text": "She cuts a round orange into four pieces."
+    },
+    {
+      "id": "accept-orange",
+      "file": "accept-orange.mp3",
+      "text": "This round fruit is full of juice. Mia uses an orange."
+    },
+    {
+      "id": "word-grape",
+      "file": "word-grape.mp3",
+      "text": "grape"
+    },
+    {
+      "id": "train-grape",
+      "file": "train-grape.mp3",
+      "text": "Mia puts a purple grape in her lunch box."
+    },
+    {
+      "id": "accept-grape",
+      "file": "accept-grape.mp3",
+      "text": "Many small purple fruits grow in one bunch. Tom eats a grape."
+    },
+    {
+      "id": "word-milk",
+      "file": "word-milk.mp3",
+      "text": "milk"
+    },
+    {
+      "id": "train-milk",
+      "file": "train-milk.mp3",
+      "text": "Mia drinks a glass of white milk."
+    },
+    {
+      "id": "accept-milk",
+      "file": "accept-milk.mp3",
+      "text": "Mia drinks a glass of white milk with breakfast."
+    },
+    {
+      "id": "word-bread",
+      "file": "word-bread.mp3",
+      "text": "bread"
+    },
+    {
+      "id": "train-bread",
+      "file": "train-bread.mp3",
+      "text": "There is a piece of bread on her plate."
+    },
+    {
+      "id": "accept-bread",
+      "file": "accept-bread.mp3",
+      "text": "Tom is hungry. He eats a piece of bread with his egg."
+    },
+    {
+      "id": "word-water",
+      "file": "word-water.mp3",
+      "text": "water"
+    },
+    {
+      "id": "train-water",
+      "file": "train-water.mp3",
+      "text": "She also takes a bottle of water."
+    },
+    {
+      "id": "accept-water",
+      "file": "accept-water.mp3",
+      "text": "After running, Lily is very thirsty. She drinks some water."
+    },
+    {
+      "id": "word-juice",
+      "file": "word-juice.mp3",
+      "text": "juice"
+    },
+    {
+      "id": "train-juice",
+      "file": "train-juice.mp3",
+      "text": "She takes some fruit juice to school."
+    },
+    {
+      "id": "accept-juice",
+      "file": "accept-juice.mp3",
+      "text": "The sweet drink is made from apples. It is apple juice."
+    },
+    {
+      "id": "word-cat",
+      "file": "word-cat.mp3",
+      "text": "cat"
+    },
+    {
+      "id": "train-cat",
+      "file": "train-cat.mp3",
+      "text": "A small cat sleeps under the tree."
+    },
+    {
+      "id": "accept-cat",
+      "file": "accept-cat.mp3",
+      "text": "The small animal says 'meow' and sits on the sofa. It is a cat."
+    },
+    {
+      "id": "word-dog",
+      "file": "word-dog.mp3",
+      "text": "dog"
+    },
+    {
+      "id": "train-dog",
+      "file": "train-dog.mp3",
+      "text": "A brown dog runs in the park."
+    },
+    {
+      "id": "accept-dog",
+      "file": "accept-dog.mp3",
+      "text": "The animal says 'woof' and runs with Tom. It is a dog."
+    },
+    {
+      "id": "word-bird",
+      "file": "word-bird.mp3",
+      "text": "bird"
+    },
+    {
+      "id": "train-bird",
+      "file": "train-bird.mp3",
+      "text": "A bird sings in the tree."
+    },
+    {
+      "id": "accept-bird",
+      "file": "accept-bird.mp3",
+      "text": "The animal has wings and sings in the tree. It is a bird."
+    },
+    {
+      "id": "word-fish",
+      "file": "word-fish.mp3",
+      "text": "fish"
+    },
+    {
+      "id": "train-fish",
+      "file": "train-fish.mp3",
+      "text": "Three fish swim in the pond."
+    },
+    {
+      "id": "accept-fish",
+      "file": "accept-fish.mp3",
+      "text": "The animal lives in the pond and swims. It is a fish."
+    },
+    {
+      "id": "word-red",
+      "file": "word-red.mp3",
+      "text": "red"
+    },
+    {
+      "id": "train-red",
+      "file": "train-red.mp3",
+      "text": "Mia's school bag is red, like an apple."
+    },
+    {
+      "id": "accept-red",
+      "file": "accept-red.mp3",
+      "text": "Lily's bag is the color of an apple. The bag is red."
+    },
+    {
+      "id": "word-blue",
+      "file": "word-blue.mp3",
+      "text": "blue"
+    },
+    {
+      "id": "train-blue",
+      "file": "train-blue.mp3",
+      "text": "Her school shoes are blue, like the sky."
+    },
+    {
+      "id": "accept-blue",
+      "file": "accept-blue.mp3",
+      "text": "Tom looks at the sky on a sunny day. The sky is blue."
+    },
+    {
+      "id": "word-green",
+      "file": "word-green.mp3",
+      "text": "green"
+    },
+    {
+      "id": "train-green",
+      "file": "train-green.mp3",
+      "text": "Mia finds a green pencil case in her bag."
+    },
+    {
+      "id": "accept-green",
+      "file": "accept-green.mp3",
+      "text": "The leaves in the park are the color of grass. They are green."
+    },
+    {
+      "id": "word-yellow",
+      "file": "word-yellow.mp3",
+      "text": "yellow"
+    },
+    {
+      "id": "train-yellow",
+      "file": "train-yellow.mp3",
+      "text": "She writes with a yellow pencil."
+    },
+    {
+      "id": "accept-yellow",
+      "file": "accept-yellow.mp3",
+      "text": "The sun looks like a big yellow ball."
+    },
+    {
+      "id": "word-book",
+      "file": "word-book.mp3",
+      "text": "book"
+    },
+    {
+      "id": "train-book",
+      "file": "train-book.mp3",
+      "text": "Mia opens her English book."
+    },
+    {
+      "id": "accept-book",
+      "file": "accept-book.mp3",
+      "text": "Mia opens her book and reads a story."
+    },
+    {
+      "id": "word-pencil",
+      "file": "word-pencil.mp3",
+      "text": "pencil"
+    },
+    {
+      "id": "train-pencil",
+      "file": "train-pencil.mp3",
+      "text": "Mia draws a bird with her pencil."
+    },
+    {
+      "id": "accept-pencil",
+      "file": "accept-pencil.mp3",
+      "text": "Tom draws a cat with a pencil."
+    },
+    {
+      "id": "word-school",
+      "file": "word-school.mp3",
+      "text": "school"
+    },
+    {
+      "id": "train-school",
+      "file": "train-school.mp3",
+      "text": "Mia meets her teacher at school."
+    },
+    {
+      "id": "accept-school",
+      "file": "accept-school.mp3",
+      "text": "Lily meets her teacher and friends at school every morning."
+    },
+    {
+      "id": "word-friend",
+      "file": "word-friend.mp3",
+      "text": "friend"
+    },
+    {
+      "id": "train-friend",
+      "file": "train-friend.mp3",
+      "text": "Mia walks home with her best friend, Lily."
+    },
+    {
+      "id": "accept-friend",
+      "file": "accept-friend.mp3",
+      "text": "Tom and Mia play together every day. Mia is Tom's friend."
+    },
+    {
+      "id": "story-1",
+      "file": "story-1.mp3",
+      "text": "In the morning, Mia puts an apple, a banana and an orange on the table. She eats some bread and drinks a glass of milk."
+    },
+    {
+      "id": "story-2",
+      "file": "story-2.mp3",
+      "text": "Mia puts a purple grape in her lunch box. She takes some fruit juice and a bottle of water. Her school bag is red and her shoes are blue."
+    },
+    {
+      "id": "story-3",
+      "file": "story-3.mp3",
+      "text": "At school, Mia opens her green book. She writes with a yellow pencil and draws a bird."
+    },
+    {
+      "id": "story-4",
+      "file": "story-4.mp3",
+      "text": "After school, Mia walks home with her friend. They see a cat and a dog. A bird sings in the tree, and three fish swim in the pond."
+    }
+  ]
+}

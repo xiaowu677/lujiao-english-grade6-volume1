@@ -1,0 +1,36 @@
+# 鲁教版六年级英语上册
+
+单词星球 2.1 词汇训练成品集合。
+
+每套页面均包含：
+
+- 英译中、听音辨义、听音选词、中译英四轮基础训练
+- 四幕语境故事
+- 语境训练与最终验收
+- 错词订正和可截图成绩单
+- 桌面端与手机端适配
+
+## 单元成品
+
+| 单元 | 全部词条版 | 重点词汇版 |
+| --- | --- | --- |
+| Unit 1 · 49 / 22 | [打开](outputs/v2.1-unit1/index.html) | [打开](outputs/v2.1-unit1-key/index.html) |
+| Unit 2 · 43 / 20 | [打开](outputs/v2.1-unit2/index.html) | [打开](outputs/v2.1-unit2-key/index.html) |
+| Unit 3 · 43 / 30 | [打开](outputs/v2.1-unit3/index.html) | [打开](outputs/v2.1-unit3-key/index.html) |
+| Unit 4 · 35 / 22 | [打开](outputs/v2.1-unit4/index.html) | [打开](outputs/v2.1-unit4-key/index.html) |
+| Unit 5 · 37 / 25 | [打开](outputs/v2.1-unit5/index.html) | [打开](outputs/v2.1-unit5-key/index.html) |
+| Unit 6 · 53 / 34 | [打开](outputs/v2.1-unit6/index.html) | [打开](outputs/v2.1-unit6-key/index.html) |
+| Bridging Unit 1 · 24 / 12 | [打开](outputs/v2.1-bridging-unit1/index.html) | [打开](outputs/v2.1-bridging-unit1-key/index.html) |
+| Bridging Unit 2 · 6 / 5 | [打开](outputs/v2.1-bridging-unit2/index.html) | [打开](outputs/v2.1-bridging-unit2-key/index.html) |
+| Bridging Unit 3 · 9 / 8 | [打开](outputs/v2.1-bridging-unit3/index.html) | [打开](outputs/v2.1-bridging-unit3-key/index.html) |
+
+## 说明
+
+- 表格中的数字依次表示“全部词条数量 / 重点词汇数量”。
+- 页面为可独立打开的单文件 HTML。
+- 单词发音使用访问设备提供的浏览器英语语音能力。
+- 学习进度保存在当前浏览器的本地存储中。
+
+## 制作文档
+
+[单词星球 2.1 完整制作 SOP 与提示词](outputs/单词星球2.1制作SOP与提示词.md)

@@ -1,0 +1,8 @@
+# Local build workspace, screenshots and browser profiles
+work/
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
