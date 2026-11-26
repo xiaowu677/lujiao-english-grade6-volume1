@@ -229,7 +229,7 @@
 
       .voice-row {
         display: grid;
-        grid-template-columns: minmax(180px, 0.45fr) minmax(260px, 1fr) auto;
+        grid-template-columns: minmax(260px, 1fr) auto;
         gap: 12px;
         align-items: end;
       }
@@ -605,10 +605,6 @@
         </div>
         <div class="voice-row">
           <label>
-            年级 / 课程
-            <select id="course-select"></select>
-          </label>
-          <label>
             音色
             <select id="voice-select"></select>
           </label>
@@ -680,7 +676,6 @@
     <script>
       const state = {
         meta: null,
-        course: "",
         voice: "",
         job: null,
         pollTimer: null,
@@ -719,46 +714,7 @@
 
       function selectedVoiceLabel() {
         const voice = state.meta.voices.find((item) => item.id === state.voice);
-        const course = state.meta.courses[state.course]?.label || state.course;
-        return voice
-          ? `${course} · 微软 ${voice.name} · ${voice.region}${voice.gender}`
-          : state.voice;
-      }
-
-      function archiveUrl() {
-        return `/api/archive?course=${encodeURIComponent(
-          state.course,
-        )}&voice=${encodeURIComponent(state.voice)}`;
-      }
-
-      function applyCourseStats() {
-        const stats = state.meta.courses[state.course];
-        $("#total-count").textContent = stats.total;
-        $("#word-count").textContent = stats.counts.word || 0;
-        $("#training-count").textContent = stats.counts.training || 0;
-        $("#acceptance-count").textContent = stats.counts.acceptance || 0;
-        $("#story-count").textContent = stats.counts.story || 0;
-      }
-
-      function renderCourses() {
-        const select = $("#course-select");
-        select.innerHTML = Object.entries(state.meta.courses)
-          .map(
-            ([course, info]) =>
-              `<option value="${course}">${info.label} · ${info.total} 条</option>`,
-          )
-          .join("");
-        state.course = state.meta.defaultCourse;
-        select.value = state.course;
-        select.addEventListener("change", () => {
-          state.course = select.value;
-          state.offset = 0;
-          $("#preview-audio").hidden = true;
-          applyCourseStats();
-          renderCategories();
-          $("#download-all").href = archiveUrl();
-          loadItems();
-        });
+        return voice ? `微软 ${voice.name} · ${voice.region}${voice.gender}` : state.voice;
       }
 
       function renderVoices() {
@@ -776,7 +732,7 @@
           state.voice = select.value;
           state.offset = 0;
           $("#preview-audio").hidden = true;
-          $("#download-all").href = archiveUrl();
+          $("#download-all").href = `/api/archive?voice=${encodeURIComponent(state.voice)}`;
           loadItems();
         });
       }
@@ -788,7 +744,7 @@
             ([kind, label]) => `
               <label class="category">
                 <input type="checkbox" value="${kind}" checked />
-                <span>${label}<small>${state.meta.courses[state.course].counts[kind] || 0} 条</small></span>
+                <span>${label}<small>${state.meta.counts[kind] || 0} 条</small></span>
               </label>
             `,
           )
@@ -837,7 +793,7 @@
           $("#generate-button").disabled = false;
           $("#toggle-all-button").disabled = false;
           $("#download-all").hidden = false;
-          $("#download-all").href = archiveUrl();
+          $("#download-all").href = `/api/archive?voice=${encodeURIComponent(state.voice)}`;
           if (job.status === "complete") {
             showMessage(
               `完成：新生成 ${job.generated} 条，已存在 ${job.skipped} 条，失败 ${job.failed} 条。`,
@@ -858,7 +814,6 @@
       async function loadItems() {
         if (!state.voice) return;
         const params = new URLSearchParams({
-          course: state.course,
           voice: state.voice,
           category: $("#category-filter").value,
           search: $("#search-input").value.trim(),
@@ -887,8 +842,8 @@
                       ${
                         item.ready
                           ? `
-                            <button type="button" title="播放" data-play="/audio/${encodeURIComponent(state.course)}/${encodeURIComponent(state.voice)}/${encodeURIComponent(item.filename)}">▶</button>
-                            <a title="下载" href="/audio/${encodeURIComponent(state.course)}/${encodeURIComponent(state.voice)}/${encodeURIComponent(item.filename)}" download>↓</a>
+                            <button type="button" title="播放" data-play="/audio/${encodeURIComponent(state.voice)}/${encodeURIComponent(item.filename)}">▶</button>
+                            <a title="下载" href="/audio/${encodeURIComponent(state.voice)}/${encodeURIComponent(item.filename)}" download>↓</a>
                           `
                           : `
                             <button type="button" class="disabled" title="尚未生成">▶</button>
@@ -925,7 +880,6 @@
         button.textContent = "正在生成试听…";
         try {
           const params = new URLSearchParams({
-            course: state.course,
             voice: state.voice,
             text: "At the start of the new term, Mia has biology.",
           });
@@ -958,11 +912,7 @@
           const response = await request("/api/generate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              course: state.course,
-              voice: state.voice,
-              categories,
-            }),
+            body: JSON.stringify({ voice: state.voice, categories }),
           });
           state.job = await response.json();
           updateProgress(state.job);
@@ -977,11 +927,14 @@
       async function loadMeta() {
         const response = await request("/api/meta");
         state.meta = await response.json();
-        renderCourses();
-        applyCourseStats();
+        $("#total-count").textContent = state.meta.total;
+        $("#word-count").textContent = state.meta.counts.word || 0;
+        $("#training-count").textContent = state.meta.counts.training || 0;
+        $("#acceptance-count").textContent = state.meta.counts.acceptance || 0;
+        $("#story-count").textContent = state.meta.counts.story || 0;
         renderVoices();
         renderCategories();
-        $("#download-all").href = archiveUrl();
+        $("#download-all").href = `/api/archive?voice=${encodeURIComponent(state.voice)}`;
         await loadItems();
       }
 

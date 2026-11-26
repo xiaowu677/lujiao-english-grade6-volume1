@@ -12,8 +12,6 @@
 
 ## 单元成品
 
-### 六年级上册
-
 | 单元 | 全部词条版 | 重点词汇版 |
 | --- | --- | --- |
 | Unit 1 · 49 / 22 | [打开](outputs/v2.1-unit1/index.html) | [打开](outputs/v2.1-unit1-key/index.html) |
@@ -25,18 +23,6 @@
 | Bridging Unit 1 · 24 / 12 | [打开](outputs/v2.1-bridging-unit1/index.html) | [打开](outputs/v2.1-bridging-unit1-key/index.html) |
 | Bridging Unit 2 · 6 / 5 | [打开](outputs/v2.1-bridging-unit2/index.html) | [打开](outputs/v2.1-bridging-unit2-key/index.html) |
 | Bridging Unit 3 · 9 / 8 | [打开](outputs/v2.1-bridging-unit3/index.html) | [打开](outputs/v2.1-bridging-unit3-key/index.html) |
-
-### 七年级上册
-
-| 单元 | 全部词条版 | 核心词汇版 |
-| --- | --- | --- |
-| Unit 1 · 58 / 50 | [打开](outputs/g7-v1-unit1/index.html) | [打开](outputs/g7-v1-unit1-core/index.html) |
-| Unit 2 · 55 / 51 | [打开](outputs/g7-v1-unit2/index.html) | [打开](outputs/g7-v1-unit2-core/index.html) |
-| Unit 3 · 49 / 49 | [打开](outputs/g7-v1-unit3/index.html) | [打开](outputs/g7-v1-unit3-core/index.html) |
-| Unit 4 · 64 / 63 | [打开](outputs/g7-v1-unit4/index.html) | [打开](outputs/g7-v1-unit4-core/index.html) |
-| Unit 5 · 57 / 44 | [打开](outputs/g7-v1-unit5/index.html) | [打开](outputs/g7-v1-unit5-core/index.html) |
-| Unit 6 · 52 / 52 | [打开](outputs/g7-v1-unit6/index.html) | [打开](outputs/g7-v1-unit6-core/index.html) |
-| Unit 7 · 35 / 35 | [打开](outputs/g7-v1-unit7/index.html) | [打开](outputs/g7-v1-unit7-core/index.html) |
 
 ## 说明
 

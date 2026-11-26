@@ -16,7 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from audio_catalog import COURSES, build_catalog
+from audio_catalog import build_catalog
 
 
 APP_DIR = Path(__file__).resolve().parent
@@ -133,26 +133,17 @@ JOBS_LOCK = threading.Lock()
 ACTIVE_JOB_ID = None
 
 
-def _course_directory(course):
-    if course not in COURSES:
-        raise ValueError("不支持的课程")
-    if course == "grade6":
-        return DOWNLOADS_DIR
-    return DOWNLOADS_DIR / course
-
-
-def _catalog_for_categories(categories, course):
+def _catalog_for_categories(categories):
     selected = set(categories)
     return [
-        item for item in build_catalog(REPO_ROOT, course=course)
-        if item["kind"] in selected
+        item for item in build_catalog(REPO_ROOT) if item["kind"] in selected
     ]
 
 
-def _voice_directory(voice, course="grade6"):
+def _voice_directory(voice):
     if voice not in VOICE_IDS:
         raise ValueError("不支持的微软音色")
-    return _course_directory(course) / voice
+    return DOWNLOADS_DIR / voice
 
 
 def is_valid_audio(path):
@@ -297,10 +288,10 @@ def _set_job(job_id, **updates):
         JOBS[job_id].update(updates)
 
 
-def _start_job(voice, categories, course):
+def _start_job(voice, categories):
     global ACTIVE_JOB_ID
-    voice_dir = _voice_directory(voice, course)
-    catalog = _catalog_for_categories(categories, course)
+    voice_dir = _voice_directory(voice)
+    catalog = _catalog_for_categories(categories)
     if not catalog:
         raise ValueError("请至少选择一个生成类别")
 
@@ -312,7 +303,6 @@ def _start_job(voice, categories, course):
             "id": job_id,
             "status": "running",
             "voice": voice,
-            "course": course,
             "categories": list(categories),
             "total": len(catalog),
             "completed": 0,
@@ -422,21 +412,14 @@ class AudioToolHandler(BaseHTTPRequestHandler):
             return
 
         if parsed.path == "/api/meta":
-            course_stats = {}
-            for course, config in COURSES.items():
-                catalog = build_catalog(REPO_ROOT, course=course)
-                counts = {}
-                for item in catalog:
-                    counts[item["kind"]] = counts.get(item["kind"], 0) + 1
-                course_stats[course] = {
-                    "label": config["label"],
-                    "total": len(catalog),
-                    "counts": counts,
-                }
+            catalog = build_catalog(REPO_ROOT)
+            counts = {}
+            for item in catalog:
+                counts[item["kind"]] = counts.get(item["kind"], 0) + 1
             self._send_json(
                 {
-                    "courses": course_stats,
-                    "defaultCourse": "grade6",
+                    "total": len(catalog),
+                    "counts": counts,
                     "categories": CATEGORIES,
                     "voices": VOICES,
                     "defaultVoice": DEFAULT_VOICE,
@@ -462,17 +445,16 @@ class AudioToolHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/items":
             voice = query.get("voice", [DEFAULT_VOICE])[0]
-            course = query.get("course", ["grade6"])[0]
             category = query.get("category", ["all"])[0]
             search = query.get("search", [""])[0].strip().lower()
             offset = max(0, int(query.get("offset", ["0"])[0]))
             limit = min(100, max(1, int(query.get("limit", ["50"])[0])))
             try:
-                output_dir = _voice_directory(voice, course)
+                output_dir = _voice_directory(voice)
             except ValueError as error:
                 self._send_json({"error": str(error)}, HTTPStatus.BAD_REQUEST)
                 return
-            catalog = build_catalog(REPO_ROOT, course=course)
+            catalog = build_catalog(REPO_ROOT)
             if category != "all":
                 catalog = [item for item in catalog if item["kind"] == category]
             if search:
@@ -490,31 +472,20 @@ class AudioToolHandler(BaseHTTPRequestHandler):
                 }
                 for item in page
             ]
-            self._send_json(
-                {
-                    "course": course,
-                    "total": len(catalog),
-                    "offset": offset,
-                    "items": items,
-                }
-            )
+            self._send_json({"total": len(catalog), "offset": offset, "items": items})
             return
 
         if parsed.path == "/api/preview":
             voice = query.get("voice", [DEFAULT_VOICE])[0]
-            course = query.get("course", ["grade6"])[0]
             text = query.get("text", ["Hello, welcome to Word Quest."])[0][:500]
             try:
-                _voice_directory(voice, course)
+                _voice_directory(voice)
             except ValueError as error:
                 self._send_json({"error": str(error)}, HTTPStatus.BAD_REQUEST)
                 return
-            preview_dir = PREVIEW_DIR / course
-            preview_dir.mkdir(parents=True, exist_ok=True)
-            preview_id = hashlib.sha256(
-                f"{course}\0{voice}\0{text}".encode("utf-8")
-            ).hexdigest()[:16]
-            preview_path = preview_dir / f"{voice}-{preview_id}.mp3"
+            PREVIEW_DIR.mkdir(parents=True, exist_ok=True)
+            preview_id = hashlib.sha256(f"{voice}\0{text}".encode("utf-8")).hexdigest()[:16]
+            preview_path = PREVIEW_DIR / f"{voice}-{preview_id}.mp3"
             if not is_valid_audio(preview_path):
                 preview_path.unlink(missing_ok=True)
                 try:
@@ -531,15 +502,14 @@ class AudioToolHandler(BaseHTTPRequestHandler):
             return
 
         if parsed.path.startswith("/audio/"):
-            parts = parsed.path.split("/", 4)
-            if len(parts) != 5:
+            parts = parsed.path.split("/", 3)
+            if len(parts) != 4:
                 self._send_json({"error": "无效的音频地址"}, HTTPStatus.BAD_REQUEST)
                 return
-            course = parts[2]
-            voice = parts[3]
-            filename = Path(parts[4]).name
+            voice = parts[2]
+            filename = Path(parts[3]).name
             try:
-                output_dir = _voice_directory(voice, course)
+                output_dir = _voice_directory(voice)
             except ValueError as error:
                 self._send_json({"error": str(error)}, HTTPStatus.BAD_REQUEST)
                 return
@@ -548,16 +518,15 @@ class AudioToolHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/api/archive":
             voice = query.get("voice", [DEFAULT_VOICE])[0]
-            course = query.get("course", ["grade6"])[0]
             try:
-                output_dir = _voice_directory(voice, course)
+                output_dir = _voice_directory(voice)
             except ValueError as error:
                 self._send_json({"error": str(error)}, HTTPStatus.BAD_REQUEST)
                 return
             if not output_dir.exists():
                 self._send_json({"error": "尚未生成该音色的音频"}, HTTPStatus.NOT_FOUND)
                 return
-            archive_path = DOWNLOADS_DIR / f"WordQuest-{course}-{voice}.zip"
+            archive_path = DOWNLOADS_DIR / f"WordQuest-{voice}.zip"
             write_archive(output_dir, archive_path)
             self._send_file(archive_path, "application/zip", archive_path.name)
             return
@@ -571,11 +540,10 @@ class AudioToolHandler(BaseHTTPRequestHandler):
         try:
             payload = self._read_json_body()
             voice = payload.get("voice", DEFAULT_VOICE)
-            course = payload.get("course", "grade6")
             categories = payload.get("categories", [])
             if not isinstance(categories, list):
                 raise ValueError("生成类别格式错误")
-            job = _start_job(voice, categories, course)
+            job = _start_job(voice, categories)
             self._send_json(job, HTTPStatus.CREATED)
         except (ValueError, RuntimeError) as error:
             self._send_json({"error": str(error)}, HTTPStatus.BAD_REQUEST)
