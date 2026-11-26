@@ -38,7 +38,11 @@ jobs:
               cp "$dir/index.html" "_site/$dir/index.html"
             fi
           done
+          mkdir -p _site/outputs/assets/audio/v2.1/en-GB-SoniaNeural
+          cp -R outputs/assets/audio/v2.1/en-GB-SoniaNeural/. \
+            _site/outputs/assets/audio/v2.1/en-GB-SoniaNeural/
           test "$(find _site -name index.html | wc -l)" -eq 19
+          test "$(find _site/outputs/assets/audio/v2.1 -name '*.mp3' | wc -l)" -eq 968
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v5

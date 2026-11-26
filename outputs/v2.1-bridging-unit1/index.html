@@ -2249,7 +2249,7 @@
           </div>
 
           <div class="coming-soon">
-            <strong>2.1 语境学习版 · 设备语音</strong>
+            <strong>2.1 语境学习版 · 固定英式语音</strong>
             <span>96 格基础训练 → 4 幕故事 → 24 题语境训练 → 24 题新语境验收。</span>
           </div>
         </section>
@@ -3300,8 +3300,12 @@ if (typeof window !== 'undefined') {
     <script>
       (() => {
   const Core = window.WordQuestCore;
-  const AUDIO_BASE = '';
-  const FIXED_AUDIO_ENABLED = false;
+  const AUDIO_BASE = '../assets/audio/v2.1/en-GB-SoniaNeural/';
+  const AUDIO_MANIFEST_URL =
+    '../assets/audio/v2.1/en-GB-SoniaNeural/manifest.json';
+  const FIXED_AUDIO_ENABLED = true;
+  const MANUAL_AUDIO_ONLY =
+    window.matchMedia?.('(pointer: coarse)').matches || false;
   const PROGRESS_KEY = 'word-planet-bridging-unit-1-full-v2.1-bridging-unit1-progress-v3';
   const LEGACY_PROGRESS_KEY = 'word-planet-bridging-unit-1-full-v2.1-bridging-unit1-progress-v2';
   const SCREEN_NAMES = ['home', 'story', 'test', 'milestone', 'result'];
@@ -3359,6 +3363,8 @@ if (typeof window !== 'undefined') {
   let noticeTimer = null;
   let activeNarrationAudio = null;
   const narrationCache = new Map();
+  const narrationFiles = new Map();
+  let narrationManifestPromise = null;
   let questionSequence = 0;
   let progress = loadProgress();
   let state = createEmptyState();
@@ -3560,18 +3566,62 @@ if (typeof window !== 'undefined') {
     });
   }
 
-  function audioUrl(kind, key) {
-    return `${AUDIO_BASE}${kind}-${key}.mp3`;
+  function normalizeAudioText(text) {
+    return String(text || '').replace(/\s+/g, ' ').trim();
   }
 
-  function getNarrationAudio(kind, key) {
-    const url = audioUrl(kind, key);
+  function loadNarrationManifest() {
+    if (narrationManifestPromise) {
+      return narrationManifestPromise;
+    }
+
+    narrationManifestPromise = fetch(AUDIO_MANIFEST_URL, {
+      cache: 'force-cache',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`固定语音清单加载失败：${response.status}`);
+        }
+        return response.json();
+      })
+      .then((manifest) => {
+        narrationFiles.clear();
+        for (const item of manifest.items || []) {
+          narrationFiles.set(
+            `${item.kind}\0${normalizeAudioText(item.text)}`,
+            item.file,
+          );
+        }
+        return narrationFiles;
+      })
+      .catch((error) => {
+        narrationManifestPromise = null;
+        throw error;
+      });
+
+    return narrationManifestPromise;
+  }
+
+  function narrationAudioFile(narration) {
+    const key = `${narration.kind}\0${normalizeAudioText(narration.text)}`;
+    const filename = narrationFiles.get(key);
+
+    if (!filename) {
+      throw new Error('固定语音清单中没有找到当前内容');
+    }
+
+    return filename;
+  }
+
+  function getNarrationAudio(narration) {
+    const filename = narrationAudioFile(narration);
+    const url = `${AUDIO_BASE}${filename}`;
     let audio = narrationCache.get(url);
 
     if (!audio) {
       audio = new Audio(url);
       audio.preload = 'auto';
-      audio.dataset.audioId = `${kind}-${key}`;
+      audio.dataset.audioId = filename;
       narrationCache.set(url, audio);
     }
 
@@ -3608,7 +3658,7 @@ if (typeof window !== 'undefined') {
       .forEach((element) => element.classList.add('needs-audio-tap'));
   }
 
-  function playFixedNarration(narration, { manual = false } = {}) {
+  async function playFixedNarration(narration, { manual = false } = {}) {
     if (!narration) {
       return;
     }
@@ -3618,9 +3668,17 @@ if (typeof window !== 'undefined') {
       return;
     }
 
+    try {
+      await loadNarrationManifest();
+    } catch (error) {
+      showAudioNotice('固定语音清单加载失败，已切换为设备英文语音。');
+      speakText(narration.text);
+      return;
+    }
+
     speech?.cancel();
     activeNarrationAudio?.pause();
-    const audio = getNarrationAudio(narration.kind, narration.key);
+    const audio = getNarrationAudio(narration);
     let fellBack = false;
     activeNarrationAudio = audio;
     audio.currentTime = 0;
@@ -3681,7 +3739,7 @@ if (typeof window !== 'undefined') {
 
     if (question.mode === 'context-training') {
       return {
-        kind: 'train',
+        kind: 'training',
         key: question.word.en,
         text: question.sentence,
       };
@@ -3689,7 +3747,7 @@ if (typeof window !== 'undefined') {
 
     if (question.mode.startsWith('context-')) {
       return {
-        kind: 'accept',
+        kind: 'acceptance',
         key: question.word.en,
         text: question.sentence,
       };
@@ -4323,7 +4381,7 @@ if (typeof window !== 'undefined') {
 
     const narration = narrationForQuestion(question);
 
-    if (narration) {
+    if (narration && !MANUAL_AUDIO_ONLY) {
       autoPlayTimer = window.setTimeout(
         () => {
           if (FIXED_AUDIO_ENABLED) {
@@ -4936,6 +4994,10 @@ if (typeof window !== 'undefined') {
     refreshVoices();
     speech.addEventListener?.('voiceschanged', refreshVoices);
   }
+
+      loadNarrationManifest().catch(() => {
+        // The manual replay fallback reports a useful message on first click.
+      });
 
   window.addEventListener('beforeunload', () => {
     window.clearTimeout(advanceTimer);
