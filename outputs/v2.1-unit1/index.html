@@ -3729,13 +3729,8 @@ if (typeof window !== 'undefined') {
   const AUDIO_MANIFEST_URL =
     '../assets/audio/v2.1/en-GB-SoniaNeural/manifest.json';
   const FIXED_AUDIO_ENABLED = true;
-  const MANUAL_AUDIO_ONLY =
-    /iP(hone|ad|od)|Android|Mobile|MicroMessenger/i.test(
-      navigator.userAgent,
-    ) ||
-    window.matchMedia?.('(pointer: coarse)').matches ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
-    false;
+  const SILENT_AUDIO =
+    'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQIAAAAAAA==';
   const PROGRESS_KEY = 'word-planet-unit-1-v2.1-unit1-progress-v3';
   const LEGACY_PROGRESS_KEY = 'word-planet-unit-1-v2.1-unit1-progress-v2';
   const SCREEN_NAMES = ['home', 'story', 'test', 'milestone', 'result'];
@@ -3792,7 +3787,9 @@ if (typeof window !== 'undefined') {
   let advanceTimer = null;
   let noticeTimer = null;
   let activeNarrationAudio = null;
-  const narrationCache = new Map();
+  const narrationPlayer = new Audio();
+  narrationPlayer.preload = 'auto';
+  narrationPlayer.playsInline = true;
   const narrationFiles = new Map();
   let narrationManifestPromise = null;
   let questionSequence = 0;
@@ -4046,16 +4043,15 @@ if (typeof window !== 'undefined') {
   function getNarrationAudio(narration) {
     const filename = narrationAudioFile(narration);
     const url = `${AUDIO_BASE}${filename}`;
-    let audio = narrationCache.get(url);
+    const absoluteUrl = new URL(url, window.location.href).href;
 
-    if (!audio) {
-      audio = new Audio(url);
-      audio.preload = 'auto';
-      audio.dataset.audioId = filename;
-      narrationCache.set(url, audio);
+    if (narrationPlayer.src !== absoluteUrl) {
+      narrationPlayer.src = url;
+      narrationPlayer.dataset.audioId = filename;
+      narrationPlayer.load();
     }
 
-    return audio;
+    return narrationPlayer;
   }
 
   function showAudioNotice(message, persistent = false) {
@@ -4150,16 +4146,21 @@ if (typeof window !== 'undefined') {
       return;
     }
 
-    const clip = soundClips.click?.cloneNode();
-
-    if (!clip) {
-      return;
-    }
-
-    clip.volume = 0;
-    clip.play().catch(() => {
-      // Manual replay remains available if the browser requires another tap.
-    });
+    narrationPlayer.pause();
+    narrationPlayer.src = SILENT_AUDIO;
+    narrationPlayer.dataset.audioId = 'unlock';
+    narrationPlayer.volume = 0;
+    narrationPlayer.currentTime = 0;
+    activeNarrationAudio = narrationPlayer;
+    narrationPlayer
+      .play()
+      .then(() => {
+        narrationPlayer.volume = 1;
+      })
+      .catch(() => {
+        narrationPlayer.volume = 1;
+        // Manual replay remains available if this browser rejects audio.
+      });
   }
 
   function narrationForQuestion(question) {
@@ -4811,7 +4812,7 @@ if (typeof window !== 'undefined') {
 
     const narration = narrationForQuestion(question);
 
-    if (narration && !MANUAL_AUDIO_ONLY) {
+    if (narration) {
       autoPlayTimer = window.setTimeout(
         () => {
           if (FIXED_AUDIO_ENABLED) {
