@@ -2114,6 +2114,46 @@
           transition-duration: 0.01ms !important;
         }
       }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .home-link {
+        display: inline-flex;
+        min-height: 30px;
+        align-items: center;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: #c7d7ff;
+        background: rgba(12, 26, 61, 0.6);
+        font-size: 10px;
+        font-weight: 800;
+        text-decoration: none;
+        transition:
+          border-color 0.16s ease,
+          color 0.16s ease;
+      }
+
+      .home-link:hover {
+        border-color: rgba(97, 217, 255, 0.42);
+        color: #effaff;
+      }
+
+      @media (max-width: 560px) {
+        .topbar .unit-tag {
+          display: none;
+        }
+
+        .home-link {
+          padding: 0 10px;
+          font-size: 9px;
+        }
+      }
+
     </style>
   </head>
   <body>
@@ -2123,7 +2163,10 @@
           <span class="brand-mark" aria-hidden="true">✦</span>
           <span class="brand-copy">单词星球<small>WORD QUEST</small></span>
         </div>
-        <span class="unit-tag">UNIT 03 · V2.1</span>
+        <div class="topbar-actions">
+          <a class="home-link" href="../../" aria-label="返回全部单元">← 返回单元列表</a>
+          <span class="unit-tag">UNIT 03 · V2.1</span>
+        </div>
       </header>
 
       <main>
@@ -3772,27 +3815,59 @@ if (typeof window !== 'undefined') {
     voices = speech ? speech.getVoices() : [];
   }
 
+  function naturalSpeechText(text) {
+    const replacements = {
+      "would('d) like to": "would like to",
+      "at the back (of)": "at the back of",
+      "How about ...?": "How about",
+      "You're welcome.": "You're welcome",
+      "a lot of / lots of": "a lot of, or lots of",
+      "re": "re",
+    };
+    let normalized = String(text || '');
+
+    for (const [sourceText, spokenText] of Object.entries(replacements)) {
+      normalized = normalized.replaceAll(sourceText, spokenText);
+    }
+
+    return normalized.replaceAll(/\s+/g, ' ').trim();
+  }
+
   function speakText(text) {
     if (!speech) {
       feedback.textContent = '当前浏览器不支持朗读，请尝试使用 Edge、Chrome 或 Safari。';
       return;
     }
 
+    if (voices.length === 0) {
+      refreshVoices();
+    }
+
     speech.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    const englishVoice = voices.find((voice) => /^en([-_]|$)/i.test(voice.lang));
-    utterance.lang = englishVoice?.lang || 'en-US';
+    const utterance = new SpeechSynthesisUtterance(naturalSpeechText(text));
+    const preferredVoice =
+      voices.find((voice) => /^en-GB/i.test(voice.lang)) ||
+      voices.find((voice) => /^en-US/i.test(voice.lang)) ||
+      voices.find((voice) => /^en([-_]|$)/i.test(voice.lang));
+    utterance.lang = preferredVoice?.lang || 'en-GB';
     utterance.rate = 0.78;
     utterance.pitch = 1;
+    utterance.volume = 1;
 
-    if (englishVoice) {
-      utterance.voice = englishVoice;
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
     }
 
     const speakerButton = document.querySelector('[data-action="replay"]');
     speakerButton?.classList.add('is-speaking');
     utterance.onend = () => speakerButton?.classList.remove('is-speaking');
-    utterance.onerror = () => speakerButton?.classList.remove('is-speaking');
+    utterance.onerror = (event) => {
+      speakerButton?.classList.remove('is-speaking');
+
+      if (event.error !== 'canceled') {
+        feedback.textContent = '英语语音播放失败，请再点击一次喇叭重试。';
+      }
+    };
     speech.speak(utterance);
   }
 
