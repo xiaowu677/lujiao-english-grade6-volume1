@@ -3407,7 +3407,12 @@ if (typeof window !== 'undefined') {
     '../assets/audio/v2.1/en-GB-SoniaNeural/manifest.json';
   const FIXED_AUDIO_ENABLED = true;
   const MANUAL_AUDIO_ONLY =
-    window.matchMedia?.('(pointer: coarse)').matches || false;
+    /iP(hone|ad|od)|Android|Mobile|MicroMessenger/i.test(
+      navigator.userAgent,
+    ) ||
+    window.matchMedia?.('(pointer: coarse)').matches ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+    false;
   const PROGRESS_KEY = 'word-planet-unit-3-v2.1-unit3-key-progress-v3';
   const LEGACY_PROGRESS_KEY = 'word-planet-unit-3-v2.1-unit3-key-progress-v2';
   const SCREEN_NAMES = ['home', 'story', 'test', 'milestone', 'result'];
