@@ -2114,8 +2114,7 @@
           transition-duration: 0.01ms !important;
         }
       }
-
-      .topbar-actions {
+.topbar-actions {
         display: flex;
         align-items: center;
         gap: 9px;
@@ -2153,7 +2152,6 @@
           font-size: 9px;
         }
       }
-
     </style>
   </head>
   <body>
@@ -4040,6 +4038,11 @@ if (typeof window !== 'undefined') {
       return;
     }
 
+    if (!FIXED_AUDIO_ENABLED) {
+      speakText(narration.text);
+      return;
+    }
+
     speech?.cancel();
     activeNarrationAudio?.pause();
     const audio = getNarrationAudio(narration.kind, narration.key);
@@ -4110,10 +4113,6 @@ if (typeof window !== 'undefined') {
     }
 
     if (question.mode.startsWith('context-')) {
-      if (question.mode === 'context-zh-en') {
-        return null;
-      }
-
       return {
         kind: 'accept',
         key: question.word.en,
@@ -4122,7 +4121,11 @@ if (typeof window !== 'undefined') {
     }
 
     if (question.mode === 'zh-en') {
-      return null;
+      return {
+        kind: 'word',
+        key: question.word.en,
+        text: question.word.en,
+      };
     }
 
     return {
@@ -4346,7 +4349,7 @@ if (typeof window !== 'undefined') {
     storySceneCount.textContent = `第 ${scene.id} / 4 幕`;
     storyText.innerHTML = highlightStory(scene.story, scene.wordEns);
     storyTranslationText.textContent = scene.storyZh;
-    storyReplayButton.hidden = !FIXED_AUDIO_ENABLED;
+    storyReplayButton.hidden = false;
     document.querySelector('.story-translation').open = false;
     showScreen('story');
   }
@@ -4567,10 +4570,6 @@ if (typeof window !== 'undefined') {
   }
 
   function replayControlMarkup(label = '再听一遍') {
-    if (!FIXED_AUDIO_ENABLED) {
-      return '';
-    }
-
     return `
       <button
         class="prompt-replay"
@@ -4623,6 +4622,7 @@ if (typeof window !== 'undefined') {
           <span class="prompt-label">读中文语境，选择英文单词</span>
           <p class="context-sentence is-zh">${blankContextLine(question.chineseBlankedSentence)}</p>
           <p class="context-caption">根据上下文判断空格处应该是哪个单词。</p>
+          ${replayControlMarkup('听英文提示')}
         </div>
       `;
     }
@@ -4630,25 +4630,15 @@ if (typeof window !== 'undefined') {
     if (question.mode === 'listen-zh' || question.mode === 'listen-en') {
       return `
         <div class="listen-panel">
-          ${
-            FIXED_AUDIO_ENABLED
-              ? `
-                <button
-                  class="speaker-button"
-                  type="button"
-                  data-action="replay"
-                  aria-label="播放 ${question.word.en} 的发音"
-                >
-                  <span class="speaker-icon" aria-hidden="true">🔊</span>
-                </button>
-              `
-              : '<div class="speaker-button is-static" aria-hidden="true"><span class="speaker-icon">🔊</span></div>'
-          }
-          <p class="listen-hint">${
-            FIXED_AUDIO_ENABLED
-              ? '点击喇叭可以再听一遍'
-              : '设备将自动播放英语发音'
-          }</p>
+          <button
+            class="speaker-button"
+            type="button"
+            data-action="replay"
+            aria-label="播放 ${question.word.en} 的发音"
+          >
+            <span class="speaker-icon" aria-hidden="true">🔊</span>
+          </button>
+          <p class="listen-hint">点击喇叭播放，可反复收听</p>
         </div>
       `;
     }
@@ -4658,6 +4648,7 @@ if (typeof window !== 'undefined') {
         <div>
           <span class="prompt-label">中文意思</span>
           <p class="prompt-word is-zh">${question.word.zh}</p>
+          ${replayControlMarkup('听英文')}
         </div>
       `;
     }
