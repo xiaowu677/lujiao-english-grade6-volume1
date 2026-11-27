@@ -3432,6 +3432,11 @@ function buildContextTrainingQuestion(wordEn, random = Math.random) {
       word.en,
       context.trainingCapitalize,
     ),
+    spokenSentence: fillContextSentence(
+      context.trainingSentence,
+      word.en,
+      false,
+    ),
     blankedSentence: blankContextSentence(context.trainingSentence),
     choices: buildContextChoices(word, 'en', random),
     correctValue: word.en,
@@ -3456,6 +3461,11 @@ function buildContextAcceptanceQuestion(wordEn, mode, random = Math.random) {
     word,
     context,
     sentence: fillContextSentence(context.acceptanceSentence, word.en),
+    spokenSentence: fillContextSentence(
+      context.acceptanceSentence,
+      word.en,
+      false,
+    ),
     blankedSentence: blankContextSentence(context.acceptanceSentence),
     chineseSentence: fillContextSentence(context.acceptanceZh, word.zh),
     chineseBlankedSentence: blankContextSentence(context.acceptanceZh),
@@ -4163,7 +4173,7 @@ if (typeof window !== 'undefined') {
       return {
         kind: 'training',
         key: question.word.en,
-        text: question.sentence,
+        text: question.spokenSentence || question.sentence,
       };
     }
 
@@ -4171,7 +4181,7 @@ if (typeof window !== 'undefined') {
       return {
         kind: 'acceptance',
         key: question.word.en,
-        text: question.sentence,
+        text: question.spokenSentence || question.sentence,
       };
     }
 
