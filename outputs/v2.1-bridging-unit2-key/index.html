@@ -212,10 +212,26 @@
         line-height: 1;
       }
 
-      @media (min-width: 769px) {
+      @media (min-width: 641px) {
         #fullscreen-button:not([hidden]) {
           display: inline-flex;
         }
+      }
+
+      body.is-pseudo-fullscreen .app-shell {
+        width: 100%;
+        max-width: none;
+        min-height: 100vh;
+        min-height: 100svh;
+        padding:
+          max(14px, env(safe-area-inset-top))
+          max(18px, env(safe-area-inset-right))
+          max(22px, env(safe-area-inset-bottom))
+          max(18px, env(safe-area-inset-left));
+      }
+
+      body.is-pseudo-fullscreen .topbar {
+        margin-bottom: 24px;
       }
 
       .screen {
@@ -3213,6 +3229,7 @@ if (typeof window !== 'undefined') {
   let advanceTimer = null;
   let noticeTimer = null;
   let activeNarrationAudio = null;
+  let pseudoFullscreen = false;
   const narrationCache = new Map();
   const narrationFiles = new Map();
   let narrationManifestPromise = null;
@@ -3342,9 +3359,8 @@ if (typeof window !== 'undefined') {
   }
 
   function syncFullscreenButton() {
-    const supported = fullscreenSupported();
-    const active = Boolean(document.fullscreenElement);
-    fullscreenButton.hidden = !supported;
+    const active = Boolean(document.fullscreenElement) || pseudoFullscreen;
+    fullscreenButton.hidden = false;
     fullscreenButton.setAttribute('aria-pressed', String(active));
     fullscreenButton.setAttribute(
       'aria-label',
@@ -3354,19 +3370,25 @@ if (typeof window !== 'undefined') {
     fullscreenLabel.textContent = active ? '退出全屏' : '全屏';
   }
 
-  async function toggleFullscreen() {
-    if (!fullscreenSupported()) {
-      return;
-    }
+  function setPseudoFullscreen(active) {
+    pseudoFullscreen = active;
+    document.body.classList.toggle('is-pseudo-fullscreen', active);
+    syncFullscreenButton();
+  }
 
+  async function toggleFullscreen() {
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
-      } else {
+      } else if (pseudoFullscreen) {
+        setPseudoFullscreen(false);
+      } else if (fullscreenSupported()) {
         await document.documentElement.requestFullscreen();
+      } else {
+        setPseudoFullscreen(true);
       }
     } catch {
-      liveRegion.textContent = '当前浏览器无法切换全屏。';
+      setPseudoFullscreen(!pseudoFullscreen);
     }
   }
 
@@ -4746,6 +4768,11 @@ if (typeof window !== 'undefined') {
   }
 
   document.addEventListener('fullscreenchange', syncFullscreenButton);
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && pseudoFullscreen) {
+      setPseudoFullscreen(false);
+    }
+  });
   syncFullscreenButton();
 
   window.addEventListener('beforeunload', () => {
