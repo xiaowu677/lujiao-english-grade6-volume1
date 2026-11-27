@@ -3686,8 +3686,16 @@ if (typeof window !== 'undefined') {
       .then((manifest) => {
         narrationFiles.clear();
         for (const item of manifest.items || []) {
+          const fileKind = String(item.file || '').split('-')[0];
+          const kind =
+            item.kind ||
+            (fileKind === 'train'
+              ? 'training'
+              : fileKind === 'accept'
+                ? 'acceptance'
+                : fileKind);
           narrationFiles.set(
-            `${item.kind}\0${normalizeAudioText(item.text)}`,
+            `${kind}\0${normalizeAudioText(item.text)}`,
             item.file,
           );
         }
@@ -3830,7 +3838,7 @@ if (typeof window !== 'undefined') {
 
     if (question.mode === 'context-training') {
       return {
-        kind: 'train',
+        kind: 'training',
         key: question.word.en,
         text: question.sentence,
       };
@@ -3838,7 +3846,7 @@ if (typeof window !== 'undefined') {
 
     if (question.mode.startsWith('context-')) {
       return {
-        kind: 'accept',
+        kind: 'acceptance',
         key: question.word.en,
         text: question.sentence,
       };
