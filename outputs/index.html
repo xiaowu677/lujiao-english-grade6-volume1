@@ -3371,6 +3371,16 @@ if (typeof window !== 'undefined') {
     return String(text || '').replace(/\s+/g, ' ').trim();
   }
 
+  function normalizeNarrationKeyText(kind, text) {
+    const normalized = normalizeAudioText(text);
+
+    if (kind === 'word' || normalized.length === 0) {
+      return normalized;
+    }
+
+    return normalized.charAt(0).toLowerCase() + normalized.slice(1);
+  }
+
   function loadNarrationManifest() {
     if (narrationManifestPromise) {
       return narrationManifestPromise;
@@ -3397,7 +3407,7 @@ if (typeof window !== 'undefined') {
                 ? 'acceptance'
                 : fileKind);
           narrationFiles.set(
-            `${kind}\0${normalizeAudioText(item.text)}`,
+            `${kind}\0${normalizeNarrationKeyText(kind, item.text)}`,
             item.file,
           );
         }
@@ -3413,7 +3423,10 @@ if (typeof window !== 'undefined') {
 
   function getNarrationAudio(narration) {
     const manifestFile = narrationFiles.get(
-      `${narration.kind}\0${normalizeAudioText(narration.text)}`,
+      `${narration.kind}\0${normalizeNarrationKeyText(
+        narration.kind,
+        narration.text,
+      )}`,
     );
     const url = `${AUDIO_BASE}${
       manifestFile || `${narration.kind}-${narration.key}.mp3`
